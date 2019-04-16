@@ -1,0 +1,4 @@
+Utility#logStatus() : log command status < success / failure
+  openFile()
+  writeStatus()
+  closeFile()

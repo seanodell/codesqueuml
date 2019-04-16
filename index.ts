@@ -68,6 +68,7 @@ abstract class ComponentNode extends BlockNode {
   private static nextAliasOrdinal: number = 1;
 
   readonly alias: string;
+  path: string|undefined;
 
   constructor(lineIndex: number, lineValue: string, indent: number) {
     super(lineIndex, lineValue, indent);
@@ -75,6 +76,7 @@ abstract class ComponentNode extends BlockNode {
     ComponentNode.nextAliasOrdinal++;
   }
 
+  abstract getId(): string;
   abstract getGroup(): string;
   abstract getComponent(): string;
   abstract getDescription(): string;
@@ -140,6 +142,10 @@ class MethodNode extends ComponentNode {
     }
     uml += `\ndeactivate ${this.alias}`;
     return uml;
+  }
+
+  getId(): string {
+    return `${this.className}#${this.methodName}`;
   }
 
   getGroup(): string {
@@ -325,9 +331,19 @@ export class Parser {
     return node;
   }
 
-  parse(): ComponentNode[]|undefined {
+  parse(componentIdMap: Map<string, string>): ComponentNode[]|undefined {
     try {
       let rootNode: Node|undefined = this.parseAllNodes();
+
+      let node = rootNode;
+      while(node != undefined) {
+        if (node instanceof ComponentNode) {
+          let path = componentIdMap.get(node.getId());
+          if (path)
+            node.path = path;
+        }
+        node = node.next;
+      }
 
       if (rootNode != undefined) {
         let rootNodes: ComponentNode[] = [];
@@ -335,7 +351,7 @@ export class Parser {
         while (rootNode) {
           if (!(rootNode instanceof ComponentNode))
             return throwLineError(rootNode.lineIndex, 'Top-level statement must be a component in the format \'Group#component()\'')
-          if ((rootNode as ComponentNode).getGroup() == undefined)
+          if (rootNode.getGroup() == undefined)
             return throwLineError(rootNode.lineIndex, 'Top-level statement missing component group name');
 
           rootNodes.push(rootNode);
@@ -421,7 +437,10 @@ function renderPlantUMLGroups(parentNode: Node): string[] {
     let components = groups.groupComponents.get(group);
     if (components)
       components.forEach((component) => {
-        plantUML.push(`participant "${component.getComponent()}" as ${component.alias}`);
+        if (component.path)
+          plantUML.push(`participant "[[${encodeURI(component.path)} ${component.getComponent()}]]" as ${component.alias}`);
+        else
+          plantUML.push(`participant "${component.getComponent()}" as ${component.alias}`);
       });
     plantUML.push("end box");
   });

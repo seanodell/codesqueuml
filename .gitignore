@@ -1,3 +1,4 @@
 *.puml
 *.svg
 node_modules
+output
