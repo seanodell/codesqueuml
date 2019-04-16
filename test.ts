@@ -13,9 +13,9 @@ function buildFile(filename: string, outputDir: string, componentIdMap: Map<stri
 
   try {
     let parser = new CodesqueUML.Parser(lines);
-    let rootNodes = parser.parse(componentIdMap);
+    let rootNodes = parser.parse();
     if (rootNodes != undefined) {
-      let plantUML = CodesqueUML.renderPlantUML(rootNodes);
+      let plantUML = CodesqueUML.renderPlantUML(rootNodes, componentIdMap);
       CodesqueUML.savePlantUMLSVG(plantUML, svgFilename);
       fs.writeFileSync(pumlFilename, plantUML);
     }

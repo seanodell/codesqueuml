@@ -10,7 +10,8 @@ Application#main(): run queued commands and log all events and status
       executeCommand() : execute command < command status
       Utility#logStatus() : log command status < success / failure
 
-  Utility#logOverallStatus() : log success / failure and status of all commands
+  Utility#finishCommand()
+    logOverallStatus() : log success / failure and status of all commands
 
   if heartbeat thread still running
     Helper#stopHeartBeat() : stop heartbeat thread

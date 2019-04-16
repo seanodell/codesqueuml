@@ -331,19 +331,9 @@ export class Parser {
     return node;
   }
 
-  parse(componentIdMap: Map<string, string>): ComponentNode[]|undefined {
+  parse(): ComponentNode[]|undefined {
     try {
       let rootNode: Node|undefined = this.parseAllNodes();
-
-      let node = rootNode;
-      while(node != undefined) {
-        if (node instanceof ComponentNode) {
-          let path = componentIdMap.get(node.getId());
-          if (path)
-            node.path = path;
-        }
-        node = node.next;
-      }
 
       if (rootNode != undefined) {
         let rootNodes: ComponentNode[] = [];
@@ -378,7 +368,7 @@ export function renderNodeGraph(parentNode: Node): string|undefined {
   }
 }
 
-function renderPlantUMLCallGraph(parentNode: Node): string[]|undefined {
+function renderPlantUMLCallGraph(parentNode: Node, componentIdMap: Map<string, string>): string[]|undefined {
   if (parentNode) {
     let plantUML: string[] = [];
 
@@ -386,7 +376,7 @@ function renderPlantUMLCallGraph(parentNode: Node): string[]|undefined {
       plantUML.push(parentNode.renderStartUML());
     }
     parentNode.children.forEach((node) => {
-      let children = renderPlantUMLCallGraph(node);
+      let children = renderPlantUMLCallGraph(node, componentIdMap);
       if (children != undefined) {
         plantUML = plantUML.concat(children);
       }
@@ -426,7 +416,7 @@ class ComponentGroups {
   }
 }
 
-function renderPlantUMLGroups(parentNode: Node): string[] {
+function renderPlantUMLGroups(parentNode: Node, componentIdMap: Map<string, string>): string[] {
   let groups = new ComponentGroups();
 
   groups.addComponent(parentNode);
@@ -437,8 +427,9 @@ function renderPlantUMLGroups(parentNode: Node): string[] {
     let components = groups.groupComponents.get(group);
     if (components)
       components.forEach((component) => {
-        if (component.path)
-          plantUML.push(`participant "[[${encodeURI(component.path)} ${component.getComponent()}]]" as ${component.alias}`);
+        let path = componentIdMap.get(component.getId());
+        if (path)
+          plantUML.push(`participant "[[${encodeURI(path)} ${component.getComponent()}]]" as ${component.alias}`);
         else
           plantUML.push(`participant "${component.getComponent()}" as ${component.alias}`);
       });
@@ -447,21 +438,21 @@ function renderPlantUMLGroups(parentNode: Node): string[] {
   return plantUML;
 }
 
-function renderRootNodePlantUML(rootNode: ComponentNode) {
+function renderRootNodePlantUML(rootNode: ComponentNode, componentIdMap: Map<string, string>) {
   let plantUML: string[] = [];
   plantUML.push(`== ${rootNode.getDescription()} ==`);
 
-  let groups = renderPlantUMLGroups(rootNode);
+  let groups = renderPlantUMLGroups(rootNode, componentIdMap);
   plantUML = plantUML.concat(groups);
 
-  let children = renderPlantUMLCallGraph(rootNode);
+  let children = renderPlantUMLCallGraph(rootNode, componentIdMap);
   if (children)
     plantUML = plantUML.concat(children);
 
   return plantUML.join("\n");
 }
 
-export function renderPlantUML(rootNodes: ComponentNode[]): string|never {
+export function renderPlantUML(rootNodes: ComponentNode[], componentIdMap: Map<string, string>): string|never {
   if (rootNodes == null || rootNodes.length == 0)
     return throwLineError(0, "No components found");
 
@@ -474,7 +465,7 @@ export function renderPlantUML(rootNodes: ComponentNode[]): string|never {
   plantUML.push(`title ${parentNode.getGroup()}#${parentNode.getComponent()}`);
 
   rootNodes.forEach((rootNode) => {
-    plantUML.push(renderRootNodePlantUML(rootNode));
+    plantUML.push(renderRootNodePlantUML(rootNode, componentIdMap));
   });
 
   plantUML.push("@enduml");
