@@ -1,0 +1,24 @@
+Application#main(): run queued commands and log all events and status
+  Helper#config(): initialize config < config file
+
+  Helper#startHeartbeat() : start heartbeating thread
+
+  performMainRoutine()
+
+    loop over an array of commands
+
+      executeCommand() : execute command < command status
+      Utility#logStatus() : log command status < success / failure
+        openFile()
+        writeStatus()
+        closeFile()
+
+  logOverallStatus() : log success / failure and status of all commands
+
+  Helper#stopHeartBeat() : stop heartbeat thread
+
+Helper#heartBeatThread() : heartbeat in the background so system knows we're working
+  loop until we're told to stop
+    heartbeat() : send heartbeat to server
+      heartbeat() : retry if call failed
+    sleep() : sleep for 17 minutes

@@ -1,0 +1,14 @@
+{
+  "name": "CodesqueUML",
+  "version": "1.0.0",
+  "dependencies": {
+    "typescript": "*",
+    "ts-node-dev": "*",
+    "@types/node": "*",
+    "shelljs": "*",
+    "node-plantuml": "*"
+  },
+  "scripts": {
+    "run": "node_modules/ts-node-dev/bin/ts-node-dev test.ts"
+  }
+}
