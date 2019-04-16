@@ -2,7 +2,6 @@ let fs = require('fs');
 let plantuml = require('node-plantuml');
 
 
-
 export class ParseError implements Error {
   name: string = "ParseError";
   message: string;
@@ -40,7 +39,7 @@ abstract class Node {
 class EmptyNode extends Node {
   private static readonly pattern = /^\s*$/;
 
-  static parse(lineIndex: number, lineValue: string): Node|undefined {
+  static parse(lineIndex: number, lineValue: string): EmptyNode|undefined {
     let match: string[]|null = EmptyNode.pattern.exec(lineValue);
     if (match != null)
       return new EmptyNode(lineIndex, lineValue, 0);
@@ -90,7 +89,7 @@ class MethodNode extends ComponentNode {
 
   private static readonly pattern = /^(\s*)(([A-Za-z$_][A-Za-z0-9$_]+)#)?([A-Za-z$_][A-Za-z0-9$_]+)\(\)(\s*:\s*(.*?)\s*)?(\s*<\s*(.*)\s*)?$/;
 
-  static parse(lineIndex: number, lineValue: string): Node|undefined {
+  static parse(lineIndex: number, lineValue: string): MethodNode|undefined {
     let match: string[]|null = MethodNode.pattern.exec(lineValue);
     if (match != null)
       return new MethodNode(lineIndex, lineValue, match[1].length, match[3], match[4], match[6], match[8]);
@@ -147,7 +146,6 @@ class MethodNode extends ComponentNode {
 }
 
 
-
 class LoopNode extends BlockNode {
   note: string;
 
@@ -159,7 +157,7 @@ class LoopNode extends BlockNode {
 
   private static readonly pattern = /^(\s*)(loop)(\s+)(\s*(.*)\s*)$/;
 
-  static parse(lineIndex: number, lineValue: string): Node|undefined {
+  static parse(lineIndex: number, lineValue: string): LoopNode|undefined {
     let match: string[]|null = LoopNode.pattern.exec(lineValue);
     if (match != null)
       return new LoopNode(lineIndex, lineValue, match[1].length, match[5]);
@@ -178,11 +176,77 @@ class LoopNode extends BlockNode {
   }
 }
 
+class IfNode extends BlockNode {
+  note: string;
+
+  private constructor(lineIndex: number, lineValue: string, indent: number,
+    note: string) {
+    super(lineIndex, lineValue, indent);
+    this.note = note;
+  }
+
+  private static readonly pattern = /^(\s*)(if)(\s+)(\s*(.*)\s*)$/;
+
+  static parse(lineIndex: number, lineValue: string): IfNode|undefined {
+    let match: string[]|null = IfNode.pattern.exec(lineValue);
+    if (match != null)
+      return new IfNode(lineIndex, lineValue, match[1].length, match[5]);
+  }
+
+  render(): string {
+    return `if ${this.note}`;
+  }
+
+  renderStartUML(): string {
+    return `alt if ${this.note}`;
+  }
+
+  renderEndUML(): string {
+    if (!(this.next instanceof ElseNode))
+      return "end";
+    return "";
+  }
+}
+
+class ElseNode extends BlockNode {
+  note: string;
+
+  private constructor(lineIndex: number, lineValue: string, indent: number,
+    note: string) {
+    super(lineIndex, lineValue, indent);
+    this.note = note;
+  }
+
+  private static readonly pattern = /^(\s*)(else)((\s+)(\s*(.*)\s*))?$/;
+
+  static parse(lineIndex: number, lineValue: string): ElseNode|undefined {
+    let match: string[]|null = ElseNode.pattern.exec(lineValue);
+    if (match != null)
+      return new ElseNode(lineIndex, lineValue, match[1].length, match[6]);
+  }
+
+  render(): string {
+    return `else${this.note ? " " + this.note : ""}`;
+  }
+
+  renderStartUML(): string {
+    return `else else${this.note ? " " + this.note : ""}`;
+  }
+
+  renderEndUML(): string {
+    if (!(this.next instanceof ElseNode))
+      return "end";
+    return "";
+  }
+}
+
 
 
 export let nodeParsers:{(index:number,value:string):Node|undefined}[] = [
   MethodNode.parse,
-  LoopNode.parse
+  LoopNode.parse,
+  IfNode.parse,
+  ElseNode.parse
 ];
 
 
@@ -231,7 +295,10 @@ export class Parser {
 
   private structureNodes(rootNode: Node): Node|undefined {
     let node: Node|undefined = rootNode.next;
+    let prevNode: Node|null = null;
     while(node != undefined && node.indent > rootNode.indent) {
+      if (prevNode)
+        prevNode.next = node;
       rootNode.children.push(node);
       node.parent = rootNode;
 
@@ -242,9 +309,9 @@ export class Parser {
         node.className = (parentNode as MethodNode).className;
       }
 
+      prevNode = node;
       node = this.structureNodes(node);
     }
-    rootNode.next = undefined;
     return node;
   }
 

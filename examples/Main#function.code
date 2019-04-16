@@ -15,10 +15,14 @@ Application#main(): run queued commands and log all events and status
 
   logOverallStatus() : log success / failure and status of all commands
 
-  Helper#stopHeartBeat() : stop heartbeat thread
+  if heartbeat thread still running
+    Helper#stopHeartBeat() : stop heartbeat thread
 
 Helper#heartBeatThread() : heartbeat in the background so system knows we're working
   loop until we're told to stop
     heartbeat() : send heartbeat to server
-      heartbeat() : retry if call failed
-    sleep() : sleep for 17 minutes
+
+    if call to server failed
+      reconnect()
+    else
+      sleep() : sleep for 15 minutes
