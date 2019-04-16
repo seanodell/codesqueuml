@@ -1,5 +1,5 @@
 {
-  "name": "CodesqueUML",
+  "name": "codesqueuml",
   "version": "1.0.0",
   "dependencies": {
     "typescript": "*",
