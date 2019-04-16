@@ -57,12 +57,22 @@ abstract class BlockNode extends Node {
 }
 
 
-export abstract class ComponentNode extends BlockNode {
+abstract class ComponentNode extends BlockNode {
   static getComponentParent(childNode: Node): ComponentNode|undefined {
     let componentParent: Node|undefined = childNode.parent;
     while (componentParent != undefined && !(componentParent instanceof ComponentNode))
       componentParent = componentParent.parent;
     return componentParent;
+  }
+
+  private static nextAliasOrdinal: number = 1;
+
+  readonly alias: string;
+
+  constructor(lineIndex: number, lineValue: string, indent: number) {
+    super(lineIndex, lineValue, indent);
+    this.alias = `C${ComponentNode.nextAliasOrdinal}`;
+    ComponentNode.nextAliasOrdinal++;
   }
 
   abstract getGroup(): string;
@@ -111,11 +121,11 @@ class MethodNode extends ComponentNode {
     let componentParent = ComponentNode.getComponentParent(this);
     let uml = "";
     if (componentParent) {
-      uml += `"${componentParent.getComponent()}" -> "${this.methodName}()"`
+      uml += `${componentParent.alias} -> ${this.alias}`
       if (this.callComment)
         uml += `: ${this.callComment}`;
     }
-    uml += `\nactivate "${this.methodName}()"`;
+    uml += `\nactivate ${this.alias}`;
     return uml;
   }
 
@@ -124,11 +134,11 @@ class MethodNode extends ComponentNode {
     let componentParent = ComponentNode.getComponentParent(this);
     if (componentParent) {
       if (this.returnComment)
-        uml = `"${this.methodName}()" --> "${componentParent.getComponent()}": ${this.returnComment}`
+        uml = `${this.alias} --> ${componentParent.alias}: ${this.returnComment}`
       else
-        uml = `"${this.methodName}()" --> "${componentParent.getComponent()}"`
+        uml = `${this.alias} --> ${componentParent.alias}`
     }
-    uml += `\ndeactivate "${this.methodName}()"`;
+    uml += `\ndeactivate ${this.alias}`;
     return uml;
   }
 
@@ -375,8 +385,8 @@ function renderPlantUMLCallGraph(parentNode: Node): string[]|undefined {
 
 class ComponentGroups {
   groups = new Array<string>();
-  groupComponents = new Map<string, string[]>();
-  components = new Set<string>();
+  groupComponents = new Map<string, ComponentNode[]>();
+  components = new Set<ComponentNode>();
 
   addComponent(node: Node) {
     if (node instanceof ComponentNode) {
@@ -387,10 +397,10 @@ class ComponentGroups {
         this.groups.push(node.getGroup());
       }
 
-      let component = this.components.has(node.getComponent());
+      let component = this.components.has(node);
       if (!component) {
-        this.components.add(node.getComponent());
-        group.push(node.getComponent());
+        this.components.add(node);
+        group.push(node);
       }
     }
 
@@ -411,7 +421,7 @@ function renderPlantUMLGroups(parentNode: Node): string[] {
     let components = groups.groupComponents.get(group);
     if (components)
       components.forEach((component) => {
-        plantUML.push(`participant "${component}"`);
+        plantUML.push(`participant "${component.getComponent()}" as ${component.alias}`);
       });
     plantUML.push("end box");
   });
