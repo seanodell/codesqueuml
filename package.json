@@ -15,5 +15,9 @@
     "build": "tsc --declaration",
     "prepublish": "rm -rf output && rm -f *.d.ts && rm -f *.js && rm -f *.tgz && tsc --declaration",
     "run": "node_modules/ts-node-dev/bin/ts-node-dev test.ts"
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/seanodell/codesqueuml.git"
   }
 }
