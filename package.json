@@ -17,13 +17,12 @@
     "node": ">=11.0.0"
   },
   "scripts": {
-    "build": "tsc --declaration",
     "prepare": "rm -rf output && rm -f *.d.ts && rm -f *.js && rm -f *.tgz && tsc --declaration",
     "run": "node_modules/ts-node-dev/bin/ts-node-dev test.ts"
   },
   "files": [
-    "*.ts",
-    "*.js"
+    "index.ts",
+    "index.js"
   ],
   "repository": {
     "type": "git",
