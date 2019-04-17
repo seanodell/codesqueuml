@@ -8,7 +8,11 @@
     "shelljs": "*",
     "node-plantuml": "*"
   },
+  "engines": {
+    "node": ">=11.0.0"
+  },
   "scripts": {
+    "build": "tsc --declaration",
     "run": "node_modules/ts-node-dev/bin/ts-node-dev test.ts"
   }
 }

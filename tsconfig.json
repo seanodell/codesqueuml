@@ -6,6 +6,7 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": false,
     "strict": true,
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "module": "commonjs"
   }
 }
