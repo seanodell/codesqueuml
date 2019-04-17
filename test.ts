@@ -4,7 +4,7 @@ let shell = require('shelljs');
 
 import * as CodesqueUML from './index';
 
-function buildFile(filename: string, outputDir: string, componentIdMap: Map<string, string>) {
+async function buildFile(filename: string, outputDir: string, componentIdMap: Map<string, string>) {
   let pumlFilename = outputDir + '/' + filename.replace("#", ".").replace(/[/\\]/, ".")
     .replace(/\.[^.]+$/, ".puml")
   let svgFilename = pumlFilename.replace(/\.[^.]+$/, ".svg")
@@ -16,7 +16,7 @@ function buildFile(filename: string, outputDir: string, componentIdMap: Map<stri
     let rootNodes = parser.parse();
     if (rootNodes != undefined) {
       let plantUML = CodesqueUML.renderPlantUML(rootNodes, componentIdMap);
-      CodesqueUML.savePlantUMLSVG(plantUML, svgFilename);
+      await CodesqueUML.savePlantUMLSVG(plantUML, svgFilename);
       fs.writeFileSync(pumlFilename, plantUML);
     }
   } catch (e) {
@@ -24,6 +24,7 @@ function buildFile(filename: string, outputDir: string, componentIdMap: Map<stri
   }
 }
 
+(async() => {
 shell.rm('-rf', 'output');
 shell.mkdir('output');
 
@@ -43,3 +44,4 @@ let files = fs.readdirSync('examples')
     console.log(`Building examples/${filename}`);
     buildFile(`examples/${filename}`, 'output', componentIdMap);
   });
+})();
