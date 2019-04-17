@@ -472,8 +472,13 @@ export function renderPlantUML(rootNodes: ComponentNode[], componentIdMap: Map<s
   return plantUML.join("\n");
 }
 
-export function savePlantUMLSVG(plantUML: string, filename: string): Promise<string> {
-  let gen = plantuml.generate(plantUML, {format: 'svg'});
+export enum Format {
+  SVG = "svg",
+  PNG = "png"
+}
+
+export function renderPlantUMLDiagram(plantUML: string, filename: string, format: Format): Promise<string> {
+  let gen = plantuml.generate(plantUML, {format: format});
   let out = fs.createWriteStream(filename);
   gen.out.pipe(out);
   return new Promise<string>(resolve => out.on('close', resolve));

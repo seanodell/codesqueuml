@@ -8,6 +8,7 @@ async function buildFile(filename: string, outputDir: string, componentIdMap: Ma
   let pumlFilename = outputDir + '/' + filename.replace("#", ".").replace(/[/\\]/, ".")
     .replace(/\.[^.]+$/, ".puml")
   let svgFilename = pumlFilename.replace(/\.[^.]+$/, ".svg")
+  let pngFilename = pumlFilename.replace(/\.[^.]+$/, ".png")
 
   let lines = fs.readFileSync(filename).toString().split("\n");
 
@@ -16,7 +17,8 @@ async function buildFile(filename: string, outputDir: string, componentIdMap: Ma
     let rootNodes = parser.parse();
     if (rootNodes != undefined) {
       let plantUML = CodesqueUML.renderPlantUML(rootNodes, componentIdMap);
-      await CodesqueUML.savePlantUMLSVG(plantUML, svgFilename);
+      await CodesqueUML.renderPlantUMLDiagram(plantUML, svgFilename, CodesqueUML.Format.SVG);
+      await CodesqueUML.renderPlantUMLDiagram(plantUML, pngFilename, CodesqueUML.Format.PNG);
       fs.writeFileSync(pumlFilename, plantUML);
     }
   } catch (e) {
