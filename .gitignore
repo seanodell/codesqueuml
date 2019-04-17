@@ -4,3 +4,5 @@ node_modules
 output
 .DS_Store
 *.tgz
+*.js
+*.d.ts
