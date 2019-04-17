@@ -1,6 +1,6 @@
 # CodesqueUML
 
-"What is Codesque?" you must be wondering.
+"What is CodesqueUML?" you must be wondering.
 
 Well, it's a TypeScript library packaged for npm which converts scribbly bits of
 pseudocode into extremely ugly PlantUML source code but, through the magic of
