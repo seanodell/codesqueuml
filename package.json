@@ -1,6 +1,11 @@
 {
   "name": "codesqueuml",
-  "version": "0.1.0",
+  "version": "0.1.4",
+  "author": {
+    "name": "Sean O'Dell",
+    "email": "sean@celsoft.com"
+  },
+  "license": "MIT",
   "dependencies": {
     "typescript": "*",
     "ts-node-dev": "*",
@@ -13,11 +18,15 @@
   },
   "scripts": {
     "build": "tsc --declaration",
-    "prepublish": "rm -rf output && rm -f *.d.ts && rm -f *.js && rm -f *.tgz && tsc --declaration",
+    "prepare": "rm -rf output && rm -f *.d.ts && rm -f *.js && rm -f *.tgz && tsc --declaration",
     "run": "node_modules/ts-node-dev/bin/ts-node-dev test.ts"
   },
+  "files": [
+    "*.ts",
+    "*.js"
+  ],
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/seanodell/codesqueuml.git"
+    "type": "git",
+    "url": "https://github.com/seanodell/codesqueuml.git"
   }
 }
