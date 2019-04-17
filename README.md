@@ -49,4 +49,4 @@ Helper#heartBeatThread() : heartbeat in the background so system knows we're wor
 
 ### Lovely Sequence Diagram
 
-![Example SVG](./examples/examples.Application.main.svg)
+![Example Diagram](./examples/examples.Application.main.png)
