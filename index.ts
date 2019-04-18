@@ -57,7 +57,7 @@ abstract class BlockNode extends Node {
 }
 
 
-abstract class ComponentNode extends BlockNode {
+export abstract class ComponentNode extends BlockNode {
   static getComponentParent(childNode: Node): ComponentNode|undefined {
     let componentParent: Node|undefined = childNode.parent;
     while (componentParent != undefined && !(componentParent instanceof ComponentNode))
