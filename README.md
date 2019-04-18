@@ -53,3 +53,37 @@ Helper#heartBeatThread() : heartbeat in the background so system knows we're wor
 ### Lovely Sequence Diagram
 
 ![Example Diagram](https://raw.githubusercontent.com/seanodell/codesqueuml/master/examples/examples.Application.main.png)
+
+## Tutorial
+
+### Import
+
+```typescript
+import * as codesqueuml from 'codesqueuml';
+```
+
+### Render PlantUML
+
+Create a parser and give it a smidgen of code to parse:
+
+```typescript
+let parser = new codesqueulm.Parser(`
+ClassOne#functionOne(): start functionOne process
+  ClassTwo#functionTwo(): call functionTwo < returns void
+`);
+```
+
+Parse into one or more top-level calls:
+
+```typescript
+let rootNodes = parser.parse();
+```
+
+Generate PlantUML and print to the screen:
+
+```typescript
+if (rootNodes) {
+  let plantUML = codesqueulm.renderPlantUML(rootNodes);
+  console.log(plantUML);
+}
+```
