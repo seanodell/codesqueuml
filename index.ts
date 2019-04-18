@@ -271,8 +271,8 @@ export class Parser {
   private index: number = 0;
   private readonly lines: string[];
 
-  constructor(lines: string[]) {
-    this.lines = lines;
+  constructor(code: string) {
+    this.lines = code.split("\n");
   };
 
   private parseNode(): Node|undefined {
