@@ -4,3 +4,4 @@ output
 *.tgz
 *.js
 *.d.ts
+*.svg

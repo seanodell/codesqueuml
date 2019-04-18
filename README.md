@@ -87,3 +87,43 @@ if (rootNodes) {
   console.log(plantUML);
 }
 ```
+
+Simplify things a bit and generate an SVG file:
+
+```typescript
+let firstCodeNodes = new codesqueulm.Parser(`
+ClassOne#functionOne(): start functionOne process
+  ClassTwo#functionTwo(): call functionTwo < returns void
+`).parse();
+
+if (!firstCodeNodes) throw new Error("Darn.");
+
+let firstPlantUML = codesqueulm.renderPlantUML(firstCodeNodes);
+codesqueulm.renderPlantUMLDiagram(firstPlantUML, "first.svg", codesqueulm.Format.SVG);
+```
+
+Now a big fancy example that creates two SVG files, both of which link to each other:
+
+```typescript
+let firstCodeNodes = new codesqueulm.Parser(`
+ClassOne#functionOne(): start functionOne process
+  ClassTwo#functionTwo(): call functionTwo < returns void
+`).parse();
+
+let secondCodeNodes = new codesqueulm.Parser(`
+ClassTwo#functionTwo(): start functionTwo process
+  ClassOne#functionOne(): call functionOne < returns void
+`).parse();
+
+if (!firstCodeNodes || !secondCodeNodes) throw new Error("Darn.");
+
+let codeNodeIdMap = new Map<string, string>([
+  ["ClassOne#functionOne", "first.svg"],
+  ["ClassTwo#functionTwo", "second.svg"]]);
+
+let firstPlantUML = codesqueulm.renderPlantUML(firstCodeNodes, codeNodeIdMap);
+codesqueulm.renderPlantUMLDiagram(firstPlantUML, "first.svg", codesqueulm.Format.SVG);
+
+let secondPlantUML = codesqueulm.renderPlantUML(secondCodeNodes, codeNodeIdMap);
+codesqueulm.renderPlantUMLDiagram(secondPlantUML, "second.svg", codesqueulm.Format.SVG);
+```
