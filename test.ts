@@ -17,8 +17,8 @@ async function buildFile(filename: string, outputDir: string, componentIdMap: Ma
     let rootNodes = parser.parse();
     if (rootNodes != undefined) {
       let plantUML = CodesqueUML.renderPlantUML(rootNodes, componentIdMap);
-      await CodesqueUML.renderPlantUMLDiagram(plantUML, svgFilename, CodesqueUML.Format.SVG);
-      await CodesqueUML.renderPlantUMLDiagram(plantUML, pngFilename, CodesqueUML.Format.PNG);
+      await Promise.all([CodesqueUML.renderPlantUMLDiagram(plantUML, svgFilename, CodesqueUML.Format.SVG),
+        CodesqueUML.renderPlantUMLDiagram(plantUML, pngFilename, CodesqueUML.Format.PNG)]);
       fs.writeFileSync(pumlFilename, plantUML);
     }
   } catch (e) {
@@ -42,8 +42,11 @@ let files = fs.readdirSync('examples')
     componentIdMap.set(componentId, svgFilename);
   });
 
-  files.forEach((filename: string) => {
+  await Promise.all(files.map((filename: string) => {
     console.log(`Building examples/${filename}`);
-    buildFile(`examples/${filename}`, 'output', componentIdMap);
-  });
-})();
+    return buildFile(`examples/${filename}`, 'output', componentIdMap);
+  }));
+})().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
