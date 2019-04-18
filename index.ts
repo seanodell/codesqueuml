@@ -368,7 +368,7 @@ export function renderNodeGraph(parentNode: Node): string|undefined {
   }
 }
 
-function renderPlantUMLCallGraph(parentNode: Node, componentIdMap: Map<string, string>): string[]|undefined {
+function renderPlantUMLCallGraph(parentNode: Node): string[]|undefined {
   if (parentNode) {
     let plantUML: string[] = [];
 
@@ -376,7 +376,7 @@ function renderPlantUMLCallGraph(parentNode: Node, componentIdMap: Map<string, s
       plantUML.push(parentNode.renderStartUML());
     }
     parentNode.children.forEach((node) => {
-      let children = renderPlantUMLCallGraph(node, componentIdMap);
+      let children = renderPlantUMLCallGraph(node);
       if (children != undefined) {
         plantUML = plantUML.concat(children);
       }
@@ -416,7 +416,7 @@ class ComponentGroups {
   }
 }
 
-function renderPlantUMLGroups(parentNode: Node, componentIdMap: Map<string, string>): string[] {
+function renderPlantUMLGroups(parentNode: Node, componentIdMap: Map<string, string>|undefined): string[] {
   let groups = new ComponentGroups();
 
   groups.addComponent(parentNode);
@@ -427,7 +427,7 @@ function renderPlantUMLGroups(parentNode: Node, componentIdMap: Map<string, stri
     let components = groups.groupComponents.get(group);
     if (components)
       components.forEach((component) => {
-        let path = componentIdMap.get(component.getId());
+        let path = componentIdMap ? componentIdMap.get(component.getId()) : null;
         if (path)
           plantUML.push(`participant "[[${encodeURI(path)} ${component.getComponent()}]]" as ${component.alias}`);
         else
@@ -438,21 +438,21 @@ function renderPlantUMLGroups(parentNode: Node, componentIdMap: Map<string, stri
   return plantUML;
 }
 
-function renderRootNodePlantUML(rootNode: ComponentNode, componentIdMap: Map<string, string>) {
+function renderRootNodePlantUML(rootNode: ComponentNode, componentIdMap: Map<string, string>|undefined) {
   let plantUML: string[] = [];
   plantUML.push(`== ${rootNode.getDescription()} ==`);
 
   let groups = renderPlantUMLGroups(rootNode, componentIdMap);
   plantUML = plantUML.concat(groups);
 
-  let children = renderPlantUMLCallGraph(rootNode, componentIdMap);
+  let children = renderPlantUMLCallGraph(rootNode);
   if (children)
     plantUML = plantUML.concat(children);
 
   return plantUML.join("\n");
 }
 
-export function renderPlantUML(rootNodes: ComponentNode[], componentIdMap: Map<string, string>): string|never {
+export function renderPlantUML(rootNodes: ComponentNode[], componentIdMap?: Map<string, string>): string|never {
   if (rootNodes == null || rootNodes.length == 0)
     return throwLineError(0, "No components found");
 
