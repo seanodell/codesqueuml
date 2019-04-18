@@ -1,19 +1,26 @@
 # CodesqueUML
 
-A TypeScript library packaged for npm which converts scribbly bits of pseudocode into extremely ugly PlantUML source code.
+CodesqueUML is a TypeScript library packaged for npm which converts scribbly bits of pseudocode into extremely ugly PlantUML source code, then into lovely SVG diagrams.
 
 "What is CodesqueUML?" you must be wondering.
 
-Let's not go over THAT again. In addition to generating ugly PlantUML source
-code, through the magic of npm dependencies
-([node-plantuml](https://www.npmjs.com/package/node-plantuml)), it's also
-capable of creating quite lovely sequence diagrams in SVG format.
+Let's not go over THAT again.
 
 Now you're asking "WHY?" Well, because I have to read a lot of complicated code
 and, when I do, I like to make notes about the classes and methods called and
 add bits of information to help me understand what everything is doing. Then at
 some point I end up wanting a diagram for reference or to share with others, but
 by the time I'm done taking notes, I really want to move on to other things.
+
+## Features
+
+* Scribbly code
+* Generates PlantUML from scribbly code
+* Generates SVG and PNG diagrams from PlantUML
+* Hyperlinks in SVG so you can "surf your diagrams"
+* COMING SOON: A build script which parses all code files in one directory and
+outputs SVG diagrams to another directory, automatically generating hyperlinks
+between them
 
 ## Example
 
@@ -127,3 +134,5 @@ codesqueulm.renderPlantUMLDiagram(firstPlantUML, "first.svg", codesqueulm.Format
 let secondPlantUML = codesqueulm.renderPlantUML(secondCodeNodes, codeNodeIdMap);
 codesqueulm.renderPlantUMLDiagram(secondPlantUML, "second.svg", codesqueulm.Format.SVG);
 ```
+
+**Go open first.svg in a browser. Now.**
