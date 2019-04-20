@@ -1,6 +1,6 @@
 {
   "name": "codesqueuml",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "author": {
     "name": "Sean O'Dell",
     "email": "sean@celsoft.com"
@@ -13,10 +13,14 @@
     "shelljs": "*",
     "node-plantuml": "*"
   },
+  "devDependencies": {
+    "release-it": "^10.4.2"
+  },
   "engines": {
     "node": ">=11.0.0"
   },
   "scripts": {
+    "release": "release-it",
     "prepare": "rm -rf output && rm -f *.d.ts && rm -f *.js && rm -f *.tgz && tsc --declaration",
     "run": "node_modules/ts-node-dev/bin/ts-node-dev test.ts"
   },
