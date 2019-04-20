@@ -1,6 +1,6 @@
 {
   "name": "codesqueuml",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "author": {
     "name": "Sean O'Dell",
     "email": "sean@celsoft.com"
@@ -22,7 +22,8 @@
   },
   "files": [
     "index.ts",
-    "index.js"
+    "index.js",
+    "index.d.ts"
   ],
   "repository": {
     "type": "git",
